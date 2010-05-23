@@ -66,10 +66,14 @@ namespace browse
 		/* Game Type */
 		if( !ReadString( gametype ) )
 			return;
+		if( gametype == "MTA:SA" )
+			gametype = "";
 		
 		/* Map Name */
 		if( !ReadString( mapname ) )
 			return;
+		if( mapname == "None" )
+			mapname = "";
 		
 		/* Version */
 		if( !ReadString( temp ) )
