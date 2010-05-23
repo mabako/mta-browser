@@ -340,25 +340,46 @@ namespace browse
 		
 		unsigned char
 			players1 = 0,
-			players2 = 0;
+			maxplayers1 = 0,
+			players2 = 0,
+			maxplayers2 = 0;
 		
 		/* strtok + atoi segfaults here */
 		for( unsigned char pos = 0; pos < strlen( text1 ); ++ pos )
 			if( text1[pos] >= '0' and text1[pos] <= '9' )
 				players1 = players1 * 10 + text1[pos] - '0';
 			else if( text1[pos] == '/' )
+			{
+				for( unsigned char pos2 = pos + 1; pos2 < strlen( text1 ); ++ pos2 )
+					if( text1[pos2] >= '0' and text1[pos2] <= '9' )
+						maxplayers1 = maxplayers1 * 10 + text1[pos2] - '0';
 				break;
+			}
+		
 		
 		for( unsigned char pos = 0; pos < strlen( text2 ); ++ pos )
 			if( text2[pos] >= '0' and text2[pos] <= '9' )
 				players2 = players2 * 10 + text2[pos] - '0';
 			else if( text2[pos] == '/' )
+			{
+				for( unsigned char pos2 = pos + 1; pos2 < strlen( text2 ); ++ pos2 )
+					if( text2[pos2] >= '0' and text2[pos2] <= '9' )
+						maxplayers2 = maxplayers2 * 10 + text2[pos2] - '0';
 				break;
+			}
+		
 		
 		if( players1 > players2 )
 			return -1;
 		else if( players1 == players2 )
-			return 0;
+		{
+			if( maxplayers1 > maxplayers2 )
+				return -1;
+			else if( maxplayers1 == maxplayers2 )
+				return 0;
+			else
+				return 1;
+		}
 		else
 			return 1;
 	}
