@@ -23,6 +23,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+#ifdef WIN32
+int WinMain( HINSTANCE, HINSTANCE, LPSTR, int )
+{
+	/* Call GTK's initalization */
+	gtk_init( NULL, NULL );
+	new browse::Window( );
+	gtk_main( );
+	
+	return 0;
+}
+#else
 int main( int argc, char *argv[] )
 {
 	if( argc == 2 && ( !strcmp( argv[1], "-v" ) || !strcmp( argv[1], "--version" ) ) )
@@ -41,3 +52,5 @@ int main( int argc, char *argv[] )
 	}
 	return 0;
 }
+#endif
+

@@ -16,7 +16,12 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifdef WIN32
+#include <winsock.h>
+typedef int socklen_t;
+#else
 #include <netinet/in.h> /* sockaddr_in, socklen_t */
+#endif
 #include <string>
 
 #include "server.h"

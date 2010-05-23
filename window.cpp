@@ -30,7 +30,12 @@ namespace browse
 		
 		/* adjust some properties */
 		gtk_window_set_title( GTK_WINDOW( pgWindow ), APPLICATION_TITLE );
+#ifdef WIN32
+		gtk_window_set_default_size( GTK_WINDOW( pgWindow ), 1000, 540 );
+#else
+	 	/* Good on Linux, ugly on Windows */
 		gtk_window_set_default_size( GTK_WINDOW( pgWindow ), 1000, 480 );
+#endif
 		gtk_window_set_policy( GTK_WINDOW( pgWindow), true, true, false );
 		gtk_container_set_border_width( GTK_CONTAINER( pgWindow ), 5 );
 		

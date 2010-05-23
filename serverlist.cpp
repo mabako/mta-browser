@@ -110,12 +110,19 @@ namespace browse
 	
 	ServerList::ServerList( )
 	{
-	
+#ifdef WIN32
+	   /* Shoot me against a wall, I'm a WinSock */
+	   WSADATA wsa;
+	   WSAStartup(MAKEWORD(2,0),&wsa);
+#endif
 	}
 	
 	ServerList::~ServerList( )
 	{
 		Clear( );
+#ifdef WIN32
+	   	WSACleanup( );
+#endif
 	}
 	
 	/* Clears the old server list and instead fetches it again */

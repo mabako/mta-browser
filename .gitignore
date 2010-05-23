@@ -1,1 +1,5 @@
 browse
+*.o
+*.dll
+*.exe
+*.layout

@@ -20,10 +20,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 /* Networking stuff */
+#ifndef WIN32
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#endif
 
 #include "config.h"
 #include "serverlistitem.h"
@@ -38,9 +40,14 @@ namespace browse
 		
 		sock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
 		/* We need non-blocking sockets */
+#ifdef _WIN32
+		unsigned long flag = 1;
+		ioctlsocket( sock, FIONBIO, &flag );
+#else
 		int flags = fcntl(sock, F_GETFL);
 		flags |= O_NONBLOCK;
 		fcntl(sock, F_SETFL, flags);
+#endif
 		
 		addressSize = sizeof( address );
 		memset( &address, 0, sizeof( address ) );
@@ -58,7 +65,11 @@ namespace browse
 	ServerListItem::~ServerListItem( )
 	{
 		if( sock > 0 )
+#ifdef WIN32
+			closesocket( sock );
+#else
 			close( sock );
+#endif
 	}
 	
 	Server* ServerListItem::Pulse( )
@@ -67,7 +78,11 @@ namespace browse
 		if( recvfrom( sock, buffer, sizeof( buffer ), 0, ( sockaddr* ) &address, &addressSize ) > 0 )
 		{
 			/* Since we have some data, close our socket. */
+#ifdef WIN32
+			closesocket( sock );
+#else
 			close( sock );
+#endif
 			sock = 0;
 			
 			/* Return the details */
