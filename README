@@ -1,0 +1,13 @@
+browse
+------
+  It's just a simple GTK+ based browser using Game-Monitor and the ASE protocol to
+  query the MTA Server List.
+
+install
+-------
+  You need the curl and gtk libraries, after that it's just
+  make
+
+launch
+------
+  ./browse
