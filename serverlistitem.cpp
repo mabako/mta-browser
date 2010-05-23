@@ -68,6 +68,7 @@ namespace browse
 		{
 			/* Since we have some data, close our socket. */
 			close( sock );
+			sock = 0;
 			
 			/* Return the details */
 			return new Server( buffer, ip );
