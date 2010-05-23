@@ -16,8 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* Version of this app */
+#define VERSION                     "1.1"
+
 /* Name of the Window */
-#define APPLICATION_TITLE			"MTA Server Browser"
+#define APPLICATION_TITLE			"MTA Server Browser " VERSION
 
 /* Timeout for the complete server list to be parsed. */
 #define SERVER_LIST_MASTER_TIMEOUT	3000

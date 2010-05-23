@@ -28,7 +28,7 @@ int main( int argc, char *argv[] )
 	if( argc == 2 && ( !strcmp( argv[1], "-v" ) || !strcmp( argv[1], "--version" ) ) )
 	{
 		/* Small Version text */
-		cout << "browse - A GTK+ based MTA:SA Server Browser - Version 1.0" << endl;
+		cout << "browse - A GTK+ based MTA:SA Server Browser - Version " << VERSION << endl;
 	}
 	else
 	{
