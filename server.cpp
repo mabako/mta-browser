@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <sstream>
+#include <algorithm>
 #include <string.h>
 #include <stdlib.h>
 #include "config.h"
@@ -26,6 +27,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 namespace browse
 {
 	using namespace std;
+	
+	/* Case Insensitive string.find */
+	bool contains( const string string1, const string string2 )
+	{
+		string str1( string1 );
+		string str2( string2 );
+		transform( str1.begin(), str1.end(), str1.begin(), ::tolower );	
+		transform( str2.begin(), str2.end(), str2.begin(), ::tolower );
+		return str1.find( str2 ) != string::npos;
+	}
 	
 	Server::Server( const string queryResponse, const string _ip )
 	{
@@ -208,5 +219,40 @@ namespace browse
 			delete *iter;
 		}
 		players.clear( );
+	}
+	
+	/* Checks if the server matches the given filter */
+	const bool Server::Matches( string filter )
+	{
+		/* We're not even valid/fully initalized, skip this */
+		if( !IsValid( ) )
+			return false;
+		
+		/* Always matches no filter */
+		if( filter.length( ) == 0 )
+			return true;
+		
+		/* It's part of the server name */
+		if( contains( name, filter ) )
+			return true;
+		
+		/* It's a part of the IP */
+		if( contains( ip, filter ) )
+			return true;
+		
+		/* It's a part of the game type */
+		if( contains( gametype, filter ) )
+			return true;
+		
+		/* It's a part of the map name */
+		if( contains( mapname, filter ) )
+			return true;
+		
+		/* Check if it's contained in any player's name */
+		for( list < Player* >::iterator iter = players.begin( ); iter != players.end( ); ++ iter )
+			if( contains( (*iter)->GetName( ), filter ) )
+				return true;
+		
+		return false;
 	}
 }

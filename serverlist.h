@@ -33,11 +33,13 @@ namespace browse
 		
 		void				Refresh( );
 		list < Server* >	Pulse( );
+		list < Server* >	Filter( string filter );
 	private:
 		void				Clear( );
 		void				ParseList( string list );
 		
 		list < Server* >			servers;
 		list < ServerListItem* >	newServers;
+		string						filter;
 	};
 }

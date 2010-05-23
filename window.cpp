@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <string.h>
 #include <stdlib.h>
 #include "window.h"
@@ -67,6 +68,11 @@ namespace browse
 		gtk_scrolled_window_add_with_viewport( GTK_SCROLLED_WINDOW( pgPlayerScroll ), pgPlayerList );
 		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pgPlayerScroll, 4, 5, 0, 19 );
 		
+		/* Filter */
+		GtkWidget* pgFilter = gtk_entry_new( );
+		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pgFilter, 0, 1, 19, 20 );
+		gtk_signal_connect( GTK_OBJECT( pgFilter ), "changed", GTK_SIGNAL_FUNC( &ChangeFilter ), this );
+		
 		/* Refresh Button */
 		GtkWidget* pButtonRefresh = gtk_button_new_with_label( "Refresh" );
 		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pButtonRefresh, 3, 4, 19, 20 );
@@ -99,16 +105,37 @@ namespace browse
 			delete pServerList;
 	}
 	
+	void Window::AddToServerList( Server* server )
+	{
+		gchar* content[5];
+		content[0] = ( gchar* ) server->GetName( ).c_str( );
+		
+		GString* temp = g_string_new( NULL );
+		g_string_sprintf( temp, "%d/%d", ( unsigned int ) server->GetNumPlayers( ), ( unsigned int ) server->GetMaxPlayers( ) );
+		content[1] = temp->str;
+		
+		content[2] = ( gchar* ) server->GetGameType( ).c_str( );
+		content[3] = ( gchar* ) server->GetMapName( ).c_str( );
+		
+		GString* temp2 = g_string_new( NULL );
+		g_string_sprintf( temp2, "%s:%d", server->GetIP( ).c_str( ), server->GetPort( ) );
+		content[4] = temp2->str;
+		
+		gint row = gtk_clist_append( GTK_CLIST( pgServerList ), content );
+		gtk_clist_set_row_data( GTK_CLIST( pgServerList ), row, server );
+
+	}
+	
 	/* Called to let us handle our internal stuff. */
 	gint Window::Pulse( gpointer data )
 	{
-		Window* pgWindow = static_cast < Window* > ( data );
-		assert( pgWindow );
+		Window* pWindow = static_cast < Window* > ( data );
+		assert( pWindow );
 		
-		GtkWidget* pgServerList = pgWindow->GetServerListWidget( );
+		GtkWidget* pgServerList = pWindow->GetServerListWidget( );
 		assert( pgServerList );
 		
-		ServerList* pServerList = pgWindow->GetServerList( );
+		ServerList* pServerList = pWindow->GetServerList( );
 		assert( pServerList );
 		
 		/* Check if new servers are available */
@@ -120,24 +147,7 @@ namespace browse
 			
 			/* Add each item */
 			for( list < Server* >::iterator iter = newServers.begin( ); iter != newServers.end( ); ++ iter )
-			{
-				gchar* content[5];
-				content[0] = ( gchar* ) (*iter)->GetName( ).c_str( );
-				
-				GString* temp = g_string_new( NULL );
-				g_string_sprintf( temp, "%d/%d", ( unsigned int ) (*iter)->GetNumPlayers( ), ( unsigned int ) (*iter)->GetMaxPlayers( ) );
-				content[1] = temp->str;
-				
-				content[2] = ( gchar* ) (*iter)->GetGameType( ).c_str( );
-				content[3] = ( gchar* ) (*iter)->GetMapName( ).c_str( );
-				
-				GString* temp2 = g_string_new( NULL );
-				g_string_sprintf( temp2, "%s:%d", (*iter)->GetIP( ).c_str( ), (*iter)->GetPort( ) );
-				content[4] = temp2->str;
-				
-				gint row = gtk_clist_append( GTK_CLIST( pgServerList ), content );
-				gtk_clist_set_row_data( GTK_CLIST( pgServerList ), row, *iter );
-			}
+				pWindow->AddToServerList( *iter );
 			
 			/* Unfreeze the list again to have it updated */
 			gtk_clist_thaw( GTK_CLIST( pgServerList ) );
@@ -153,17 +163,17 @@ namespace browse
 	/* Called whenever we click 'Refresh' */
 	void Window::Refresh( GtkWidget* pWidget, gpointer data )
 	{
-		Window* pgWindow = static_cast < Window* > ( data );
-		assert( pgWindow );
+		Window* pWindow = static_cast < Window* > ( data );
+		assert( pWindow );
 		
 		/* Clear the old list */
-		GtkWidget* pgServerList = pgWindow->GetServerListWidget( );
+		GtkWidget* pgServerList = pWindow->GetServerListWidget( );
 		assert( pgServerList );
 		gtk_clist_clear( GTK_CLIST( pgServerList ) );
 
 		
 		/* Refresh the List */
-		ServerList* pServerList = pgWindow->GetServerList( );
+		ServerList* pServerList = pWindow->GetServerList( );
 		assert( pServerList );
 		pServerList->Refresh( );
 	}
@@ -171,9 +181,9 @@ namespace browse
 	/* Called whenever we click 'Close' or the X. Obviously we want to exit */
 	void Window::Destroy( GtkWidget* pWidget, gpointer data )
 	{
-		Window* pgWindow = static_cast < Window* > ( data );
-		assert( pgWindow );
-		delete pgWindow;
+		Window* pWindow = static_cast < Window* > ( data );
+		assert( pWindow );
+		delete pWindow;
 		
 		/* Let GTK handle itself. */
 		gtk_main_quit( );
@@ -182,16 +192,16 @@ namespace browse
 	/* Someone selected a server */
 	void Window::SelectServer( GtkWidget* pWdidget, gint row, gint column, GdkEventButton* event, gpointer data )
 	{
-		Window* pgWindow = static_cast < Window* > ( data );
-		assert( pgWindow );
+		Window* pWindow = static_cast < Window* > ( data );
+		assert( pWindow );
 		
 		/* Clear the old player list */
-		GtkWidget* pgPlayerList = pgWindow->GetPlayerListWidget( );
+		GtkWidget* pgPlayerList = pWindow->GetPlayerListWidget( );
 		assert( pgPlayerList );
 		gtk_clist_clear( GTK_CLIST( pgPlayerList ) );
 		
 		/* Get the List */
-		GtkWidget* pgServerList = pgWindow->GetServerListWidget( );
+		GtkWidget* pgServerList = pWindow->GetServerListWidget( );
 		assert( pgServerList );
 		
 		/* Get our Row data (Pointer to the Server result) */
@@ -219,6 +229,38 @@ namespace browse
 			
 			/* Sort me */
 			gtk_clist_sort( GTK_CLIST( pgPlayerList ) );
+		}
+	}
+	
+	/* We changed the filter */
+	void Window::ChangeFilter( GtkEntry* pEntry, gpointer data )
+	{
+		Window* pWindow = static_cast < Window* > ( data );
+		assert( pWindow );
+		
+		/* Clear the old list */
+		GtkWidget* pgServerList = pWindow->GetServerListWidget( );
+		assert( pgServerList );
+		gtk_clist_clear( GTK_CLIST( pgServerList ) );
+		
+		/* Refresh the List */
+		ServerList* pServerList = pWindow->GetServerList( );
+		assert( pServerList );
+		list < Server* > newServers = pServerList->Filter( string( ( char* ) gtk_entry_get_text( pEntry ) ) );
+		if( newServers.size( ) > 0 )
+		{
+			/* Just freeze the list for the time being to stop it from flashing */
+			gtk_clist_freeze( GTK_CLIST( pgServerList ) );
+			
+			/* Add each item */
+			for( list < Server* >::iterator iter = newServers.begin( ); iter != newServers.end( ); ++ iter )
+				pWindow->AddToServerList( *iter );
+			
+			/* Unfreeze the list again to have it updated */
+			gtk_clist_thaw( GTK_CLIST( pgServerList ) );
+			
+			/* Sort me */
+			gtk_clist_sort( GTK_CLIST( pgServerList ) );
 		}
 	}
 	

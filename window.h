@@ -35,12 +35,15 @@ namespace browse
 		static void Refresh( GtkWidget* pWidget, gpointer data );
 		static void Destroy( GtkWidget* pWidget, gpointer data );
 		static void SelectServer( GtkWidget* pWdidget, gint row, gint column, GdkEventButton* event, gpointer data );
+		static void ChangeFilter( GtkEntry* pEntry, gpointer data );
 		static gint ComparePlayers( GtkCList* list, gconstpointer ptr1, gconstpointer ptr2 );
 		
 		ServerList* GetServerList( );
 		GtkWidget*  GetServerListWidget( );
 		GtkWidget*  GetPlayerListWidget( );
 	private:
+		void        AddToServerList( Server* server );
+		
 		GtkWidget*  pgWindow;
 		GtkWidget*  pgServerList;
 		GtkWidget*  pgPlayerList;

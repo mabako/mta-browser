@@ -79,5 +79,7 @@ namespace browse
 		const unsigned char		GetNumPlayers( )			{ return numplayers; }
 		const unsigned char		GetMaxPlayers( )			{ return maxplayers; }
 		const list< Player* >	GetPlayers( )				{ return players; }
+		
+		const bool				Matches( string filter );
 	};
 }

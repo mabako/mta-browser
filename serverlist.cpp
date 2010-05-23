@@ -158,7 +158,12 @@ namespace browse
 				{
 					/* add it to the list of actually existing servers */
 					servers.push_back( server );
-					newServersThisPulse.push_back( server );
+					
+					/* We only want it to appear on the GUI if it matches our filter */
+					if( server->Matches( filter ) )
+					{
+						newServersThisPulse.push_back( server );
+					}
 				}
 			}
 			else
@@ -169,6 +174,20 @@ namespace browse
 		return newServersThisPulse;
 	}
 	
+	/* Returns all servers matching the filter */
+	list < Server* > ServerList::Filter( string _filter )
+	{
+		filter = _filter;
+		list < Server* > matchingServers;
+		
+		for( list < Server* >::iterator iter = servers.begin( ); iter != servers.end( ); ++ iter )
+			if( (*iter)->Matches( filter ) )
+				matchingServers.push_back( *iter );
+		
+		return matchingServers;
+	}
+	
+	/* Clears the whole server list */
 	void ServerList::Clear( )
 	{
 		/* Clear the old server lists */
