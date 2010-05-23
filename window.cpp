@@ -56,6 +56,7 @@ namespace browse
 		gtk_clist_set_column_width( GTK_CLIST( pgServerList ), 3, 130 );
 		gtk_clist_set_column_width( GTK_CLIST( pgServerList ), 4, 150 );
 		gtk_signal_connect( GTK_OBJECT( pgServerList ), "select-row", GTK_SIGNAL_FUNC( &SelectServer ), this );
+		gtk_signal_connect( GTK_OBJECT( pgServerList ), "unselect-row", GTK_SIGNAL_FUNC( &SelectNoServer ), this );
 		GtkObject* hadj = gtk_adjustment_new( 0.0, 0.0, 1.0, 0.01, 0.1, 0.1 );
 		GtkObject* vadj = gtk_adjustment_new( 0.0, 0.0, 1.0, 0.01, 0.1, 0.1 );
 		GtkWidget* pgServerScroll = gtk_scrolled_window_new( GTK_ADJUSTMENT( hadj ), GTK_ADJUSTMENT( vadj ) );
@@ -78,6 +79,11 @@ namespace browse
 		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pgFilter, 0, 1, 19, 20 );
 		gtk_signal_connect( GTK_OBJECT( pgFilter ), "changed", GTK_SIGNAL_FUNC( &ChangeFilter ), this );
 		
+#ifdef WIN32
+		pgButtonConnect = gtk_button_new_with_label( "Connect" );
+		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pgButtonConnect, 2, 3, 19, 20 );
+		gtk_signal_connect( GTK_OBJECT( pgButtonConnect ), "clicked", GTK_SIGNAL_FUNC( &Connect ), this );
+#endif
 		/* Refresh Button */
 		GtkWidget* pButtonRefresh = gtk_button_new_with_label( "Refresh" );
 		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pButtonRefresh, 3, 4, 19, 20 );
@@ -101,6 +107,8 @@ namespace browse
 		pServerList = new ServerList( );
 		if( pServerList )
 			pServerList->Refresh( );
+		
+		SetSelectedServer( NULL );
 	}
 	
 	/* Should we even do this? GTK can handle deletion of its widgets? */
@@ -175,13 +183,37 @@ namespace browse
 		GtkWidget* pgServerList = pWindow->GetServerListWidget( );
 		assert( pgServerList );
 		gtk_clist_clear( GTK_CLIST( pgServerList ) );
-
+		
+		/* Clear the old player list */
+		GtkWidget* pgPlayerList = pWindow->GetPlayerListWidget( );
+		assert( pgPlayerList );
+		gtk_clist_clear( GTK_CLIST( pgPlayerList ) );
 		
 		/* Refresh the List */
 		ServerList* pServerList = pWindow->GetServerList( );
 		assert( pServerList );
 		pServerList->Refresh( );
+		
+		/* We don't have no server no more */
+		pWindow->SetSelectedServer( NULL );
 	}
+	
+#ifdef WIN32
+	/* Called whenever we click 'Connect' */
+	void Window::Connect( GtkWidget* pWidget, gpointer data )
+	{
+		Window* pWindow = static_cast < Window* > ( data );
+		assert( pWindow );
+		
+		Server* pServer = pWindow->GetSelectedServer( );
+		if( pServer )
+		{
+			GString* temp = g_string_new( NULL );
+			g_string_sprintf( temp, "mtasa://%s:%d", pServer->GetIP( ).c_str( ), pServer->GetPort( ) );
+			ShellExecute( NULL, "open", temp->str, NULL, NULL, SW_SHOWNORMAL );
+		}
+	}
+#endif
 	
 	/* Called whenever we click 'Close' or the X. Obviously we want to exit */
 	void Window::Destroy( GtkWidget* pWidget, gpointer data )
@@ -235,6 +267,21 @@ namespace browse
 			/* Sort me */
 			gtk_clist_sort( GTK_CLIST( pgPlayerList ) );
 		}
+		
+		/* Save for later use */
+		pWindow->SetSelectedServer( server );
+	}
+	
+	/* Someone selected no server, tsk. */
+	void Window::SelectNoServer( GtkWidget* pWdidget, gint row, gint column, GdkEventButton* event, gpointer data )
+	{
+		Window* pWindow = static_cast < Window* > ( data );
+		assert( pWindow );
+		
+		/* Clear the old player list */
+		GtkWidget* pgPlayerList = pWindow->GetPlayerListWidget( );
+		assert( pgPlayerList );
+		gtk_clist_clear( GTK_CLIST( pgPlayerList ) );
 	}
 	
 	/* We changed the filter */
@@ -247,6 +294,11 @@ namespace browse
 		GtkWidget* pgServerList = pWindow->GetServerListWidget( );
 		assert( pgServerList );
 		gtk_clist_clear( GTK_CLIST( pgServerList ) );
+		
+		/* Clear the old player list */
+		GtkWidget* pgPlayerList = pWindow->GetPlayerListWidget( );
+		assert( pgPlayerList );
+		gtk_clist_clear( GTK_CLIST( pgPlayerList ) );
 		
 		/* Refresh the List */
 		ServerList* pServerList = pWindow->GetServerList( );
@@ -267,6 +319,9 @@ namespace browse
 			/* Sort me */
 			gtk_clist_sort( GTK_CLIST( pgServerList ) );
 		}
+		
+		/* Save for later use */
+		pWindow->SetSelectedServer( NULL );
 	}
 	
 	/* Let's compare us! We need a custom definition since we want this to be by player count. */
@@ -312,6 +367,21 @@ namespace browse
 	ServerList* Window::GetServerList( )
 	{
 		return pServerList;
+	}
+	
+	/* Returns the Server List */
+	Server* Window::GetSelectedServer( )
+	{
+		return pSelectedServer;
+	}
+	
+	/* Returns the Server List */
+	void Window::SetSelectedServer( Server* server )
+	{
+		pSelectedServer = server;
+#ifdef WIN32
+		gtk_widget_set_sensitive( GTK_WIDGET( pgButtonConnect ), server != NULL );
+#endif
 	}
 	
 	/* Returns the Server List Widget */

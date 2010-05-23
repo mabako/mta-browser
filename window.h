@@ -32,13 +32,19 @@ namespace browse
 		~Window( );
 		
 		static gint Pulse( gpointer data );
+#ifdef WIN32
+		static void Connect( GtkWidget* pWidget, gpointer data );
+#endif
 		static void Refresh( GtkWidget* pWidget, gpointer data );
 		static void Destroy( GtkWidget* pWidget, gpointer data );
 		static void SelectServer( GtkWidget* pWdidget, gint row, gint column, GdkEventButton* event, gpointer data );
+		static void SelectNoServer( GtkWidget* pWidget, gint row, gint column, GdkEventButton* event, gpointer data );
 		static void ChangeFilter( GtkEntry* pEntry, gpointer data );
 		static gint ComparePlayers( GtkCList* list, gconstpointer ptr1, gconstpointer ptr2 );
 		
 		ServerList* GetServerList( );
+		Server*     GetSelectedServer( );
+		void        SetSelectedServer( Server* server );
 		GtkWidget*  GetServerListWidget( );
 		GtkWidget*  GetPlayerListWidget( );
 	private:
@@ -47,7 +53,11 @@ namespace browse
 		GtkWidget*  pgWindow;
 		GtkWidget*  pgServerList;
 		GtkWidget*  pgPlayerList;
+#ifdef WIN32
+		GtkWidget*  pgButtonConnect;
+#endif
 		
 		ServerList* pServerList;
+		Server*     pSelectedServer;
 	};
 }
