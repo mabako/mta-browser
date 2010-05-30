@@ -21,10 +21,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 /* Networking stuff */
 #ifndef WIN32
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
+	#include <arpa/inet.h>
+#endif
+
+#ifdef DEBUG
+	#include <iostream>
 #endif
 
 #include "config.h"
@@ -34,57 +35,66 @@ namespace browse
 {
 	using namespace std;
 	
-	ServerListItem::ServerListItem( const string _ip, const unsigned short port )
+	ServerListItem::ServerListItem( const string _ip, const unsigned short port, const int socket )
 	{
-		ip = _ip;
-		
-		sock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-		/* We need non-blocking sockets */
-#ifdef _WIN32
-		unsigned long flag = 1;
-		ioctlsocket( sock, FIONBIO, &flag );
-#else
-		int flags = fcntl(sock, F_GETFL);
-		flags |= O_NONBLOCK;
-		fcntl(sock, F_SETFL, flags);
+#ifdef DEBUG
+		cout << "Server to query: " << _ip << ":" << ( unsigned int ) port << endl;
 #endif
 		
+		sock = socket;
+		ip = _ip;
+		
+		sent = false;
+		
+		/* Since we do set an address, we'll get messages only from this ip/port (below) */
 		addressSize = sizeof( address );
 		memset( &address, 0, sizeof( address ) );
 		address.sin_family = AF_INET;
 		address.sin_port = htons(port);
 		address.sin_addr.s_addr = inet_addr( ip.c_str( ) );
-		if( sendto( sock, "s", 1, 0, ( sockaddr* ) &address, addressSize ) < 0 )
-		{
-		/*
-			cout << "Error" << endl;
-		*/
-		}
 	}
 	
 	ServerListItem::~ServerListItem( )
 	{
-		if( sock > 0 )
-#ifdef WIN32
-			closesocket( sock );
-#else
-			close( sock );
-#endif
 	}
 	
-	Server* ServerListItem::Pulse( )
+	const bool ServerListItem::WasQuerySent( )
+	{
+		return sent;
+	}
+	
+	const bool ServerListItem::SendQuery( )
+	{
+		if( !WasQuerySent( ) )
+		{
+			if( sock == 0 )
+			{
+				return false;
+			}
+			else if( sendto( sock, "s", 1, 0, ( sockaddr* ) &address, addressSize ) < 0 )
+			{
+#ifdef DEBUG
+				cout << "Error for " << ip << endl;
+#endif
+				return false;
+			}
+			else
+			{
+				sent = true;
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	Server* ServerListItem::Receive( )
 	{
 		char buffer[ SERVER_LIST_QUERY_BUFFER ] = { 0 };
 		if( recvfrom( sock, buffer, sizeof( buffer ), 0, ( sockaddr* ) &address, &addressSize ) > 0 )
 		{
-			/* Since we have some data, close our socket. */
-#ifdef WIN32
-			closesocket( sock );
-#else
-			close( sock );
-#endif
+			/* Since we have some data, we don't need to reference our socket anymore. */
 			sock = 0;
-			
+		
 			/* Return the details */
 			return new Server( buffer, ip );
 		}

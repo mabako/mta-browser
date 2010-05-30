@@ -34,11 +34,13 @@ namespace browse
 	{
 	friend class ServerList;
 	public:
-		 ServerListItem( const string ip, const unsigned short port );
+		 ServerListItem( const string ip, const unsigned short port, const int socket );
 		~ServerListItem( );
 		
 	private:
-		Server* Pulse( );
+		const bool	WasQuerySent( );
+		const bool	SendQuery( );
+		Server*		Receive( );
 		
 		/* Socket stuff */
 		int sock;
@@ -47,5 +49,6 @@ namespace browse
 		
 		/* Server Information */
 		string ip;
+		bool sent;
 	};
 }

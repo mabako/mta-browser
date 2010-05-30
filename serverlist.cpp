@@ -20,6 +20,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 #include <curl/curl.h>
 
+/* Networking stuff */
+#ifndef WIN32
+	#include <sys/socket.h>
+	#include <fcntl.h>
+#endif
+
+#ifdef DEBUG
+	#include <iostream>
+#endif
+
 #include "serverlist.h"
 
 namespace browse
@@ -115,10 +125,30 @@ namespace browse
 	   WSADATA wsa;
 	   WSAStartup(MAKEWORD(2,0),&wsa);
 #endif
+		
+		/* Create a Socket - one for all our needs */
+		sock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+		
+		/* We need non-blocking sockets */
+#ifdef _WIN32
+		unsigned long flag = 1;
+		ioctlsocket( sock, FIONBIO, &flag );
+#else
+		int flags = fcntl(sock, F_GETFL);
+		flags |= O_NONBLOCK;
+		fcntl(sock, F_SETFL, flags);
+#endif
 	}
 	
 	ServerList::~ServerList( )
 	{
+		if( sock > 0 )
+#ifdef WIN32
+			closesocket( sock );
+#else
+			close( sock );
+#endif
+		
 		Clear( );
 #ifdef WIN32
 	   	WSACleanup( );
@@ -138,12 +168,12 @@ namespace browse
 			{
 				ParseList( pHTTP->GetResult( ) );
 			}
-			/*
+#ifdef DEBUG
 			else
 			{
 				cout << "Error fetching Server List: " << pHTTP->GetError( ) << endl;
 			}
-			*/
+#endif
 			delete pHTTP;
 		}
 	}
@@ -152,29 +182,47 @@ namespace browse
 	list < Server* > ServerList::Pulse( )
 	{
 		list < Server* > newServersThisPulse;
+		unsigned int sentQueriesThisPulse = 0;
 		
 		for( list < ServerListItem* >::iterator iter = newServers.begin( ); iter != newServers.end( ); )
 		{
-			Server* server = (*iter)->Pulse( );
-			if( server )
+			if( (*iter)->WasQuerySent( ) )
 			{
-				/* destroy the list item */
-				newServers.erase( iter++ );
-				
-				if( server->IsValid( ) )
+				Server* server = (*iter)->Receive( );
+				if( server )
 				{
-					/* add it to the list of actually existing servers */
-					servers.push_back( server );
-					
-					/* We only want it to appear on the GUI if it matches our filter */
-					if( server->Matches( filter ) )
+					/* destroy the list item */
+					newServers.erase( iter++ );
+				
+					if( server->IsValid( ) )
 					{
-						newServersThisPulse.push_back( server );
+						/* add it to the list of actually existing servers */
+						servers.push_back( server );
+#ifdef DEBUG
+						cout << "Server " << servers.size( ) << " (" << newServers.size( ) << " left): " << server->GetName( ) << endl;
+#endif
+						
+						/* We only want it to appear on the GUI if it matches our filter */
+						if( server->Matches( filter ) )
+						{
+							newServersThisPulse.push_back( server );
+						}
 					}
+				}
+				else
+				{
+					++ iter;
 				}
 			}
 			else
 			{
+				if( sentQueriesThisPulse < MAX_QUERIES_PER_PULSE )
+				{
+					if( (*iter)->SendQuery( ) );
+					{
+						++ sentQueriesThisPulse;
+					}
+				}
 				++ iter;
 			}
 		}
@@ -237,7 +285,7 @@ namespace browse
 			ip << (unsigned int) a << "." << (unsigned int) b << "." << (unsigned int) c << "." << (unsigned int) d;
 			
 			/* add to our server list */
-			newServers.push_back( new ServerListItem( ip.str( ), ( unsigned short )( ( list[pos+4] << 8 ) + list[pos+5] ) ) );
+			newServers.push_back( new ServerListItem( ip.str( ), ( unsigned short )( ( list[pos+4] << 8 ) + list[pos+5] ), sock ) );
 			
 			pos += 6;
 		}

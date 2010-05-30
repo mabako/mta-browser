@@ -356,7 +356,6 @@ namespace browse
 				break;
 			}
 		
-		
 		for( unsigned char pos = 0; pos < strlen( text2 ); ++ pos )
 			if( text2[pos] >= '0' and text2[pos] <= '9' )
 				players2 = players2 * 10 + text2[pos] - '0';
@@ -367,7 +366,6 @@ namespace browse
 						maxplayers2 = maxplayers2 * 10 + text2[pos2] - '0';
 				break;
 			}
-		
 		
 		if( players1 > players2 )
 			return -1;

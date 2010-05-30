@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 /* Version of this app */
-#define VERSION                     "1.2"
+#define VERSION                     "1.3"
 
 /* Name of the Window */
 #define APPLICATION_TITLE			"MTA Server Browser " VERSION
@@ -37,3 +37,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 /* ASE Version - The Game's version. Unset this to show any. */
 #define ASE_VERSION                 "1.0"
+
+/* Max. Queries to send per pulse */
+#define MAX_QUERIES_PER_PULSE		5

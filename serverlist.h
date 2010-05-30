@@ -38,6 +38,7 @@ namespace browse
 		void				Clear( );
 		void				ParseList( string list );
 		
+		int							sock;
 		list < Server* >			servers;
 		list < ServerListItem* >	newServers;
 		string						filter;
