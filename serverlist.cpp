@@ -31,7 +31,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	#include <iostream>
 #endif
 
-#include "serverlist.h"
+#include "serverlist.hpp"
 
 namespace browse
 {
@@ -152,7 +152,7 @@ namespace browse
 		
 		Clear( );
 #ifdef WIN32
-	   	WSACleanup( );
+		WSACleanup( );
 #endif
 	}
 	

@@ -23,9 +23,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	#include <netinet/in.h> /* sockaddr_in, socklen_t */
 #endif
 #include <string>
-#include <string.h> /* memcmp */
 
-#include "server.h"
+#include "server.hpp"
 
 namespace browse
 {

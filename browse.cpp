@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <iostream>
 #include <gtk/gtk.h>
-#include "window.h"
+#include "window.hpp"
 
 using namespace std;
 

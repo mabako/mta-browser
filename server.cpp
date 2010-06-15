@@ -20,8 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <string.h>
 #include <stdlib.h>
-#include "config.h"
-#include "server.h"
+#include "config.hpp"
+#include "server.hpp"
 #include <iostream>
 
 namespace browse

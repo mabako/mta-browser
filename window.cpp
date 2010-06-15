@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
-#include "window.h"
+#include "window.hpp"
 
 namespace browse
 {

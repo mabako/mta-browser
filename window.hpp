@@ -20,8 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <gtk/gtk.h>
 
-#include "config.h"
-#include "serverlist.h"
+#include "config.hpp"
+#include "serverlist.hpp"
 
 namespace browse
 {
