@@ -17,12 +17,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifdef WIN32
-#include <winsock.h>
-typedef int socklen_t;
+	#include <winsock.h>
+	typedef int socklen_t;
 #else
-#include <netinet/in.h> /* sockaddr_in, socklen_t */
+	#include <netinet/in.h> /* sockaddr_in, socklen_t */
 #endif
 #include <string>
+#include <string.h> /* memcmp */
 
 #include "server.h"
 
@@ -36,11 +37,9 @@ namespace browse
 	public:
 		 ServerListItem( const string ip, const unsigned short port, const int socket );
 		~ServerListItem( );
-		
 	private:
 		const bool	WasQuerySent( );
 		const bool	SendQuery( );
-		Server*		Receive( );
 		
 		/* Socket stuff */
 		int sock;

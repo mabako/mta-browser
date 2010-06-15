@@ -44,7 +44,7 @@ namespace browse
 	
 	class Server
 	{
-	friend class ServerListItem;
+	friend class ServerList;
 	private:
 		Server( const string queryResponse, const string ip );
 		

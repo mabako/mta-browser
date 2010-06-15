@@ -24,6 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #ifndef WIN32
 	#include <sys/socket.h>
 	#include <fcntl.h>
+	#include <arpa/inet.h>
 #endif
 
 #ifdef DEBUG
@@ -184,46 +185,55 @@ namespace browse
 		list < Server* > newServersThisPulse;
 		unsigned int sentQueriesThisPulse = 0;
 		
-		for( list < ServerListItem* >::iterator iter = newServers.begin( ); iter != newServers.end( ); )
+		sockaddr_in address;
+		socklen_t addressSize = sizeof( address );
+		char buffer[ SERVER_LIST_QUERY_BUFFER ] = { 0 };
+		while( recvfrom( sock, buffer, sizeof( buffer ), 0, ( sockaddr* ) &address, &addressSize ) > 0 )
 		{
-			if( (*iter)->WasQuerySent( ) )
+			Server* server = new Server( buffer, string( inet_ntoa( address.sin_addr ) ) );
+			if( server->IsValid( ) )
 			{
-				Server* server = (*iter)->Receive( );
-				if( server )
-				{
-					/* destroy the list item */
-					newServers.erase( iter++ );
-				
-					if( server->IsValid( ) )
-					{
-						/* add it to the list of actually existing servers */
-						servers.push_back( server );
+				/* add it to the list of existing servers */
+				servers.push_back( server );
 #ifdef DEBUG
-						cout << "Server " << servers.size( ) << " (" << newServers.size( ) << " left): " << server->GetName( ) << endl;
+				cout << "Server " << servers.size( ) << ": " << server->GetIP( ) << ":" << server->GetPort( ) << " - " << server->GetName( ) << endl;
 #endif
-						
-						/* We only want it to appear on the GUI if it matches our filter */
-						if( server->Matches( filter ) )
-						{
-							newServersThisPulse.push_back( server );
-						}
-					}
-				}
-				else
+				/* We only want it to appear on the GUI if it matches our filter */
+				if( server->Matches( filter ) )
 				{
-					++ iter;
+					newServersThisPulse.push_back( server );
 				}
 			}
 			else
 			{
+#ifdef DEBUG
+				cout << "Dropping Server " << inet_ntoa( address.sin_addr ) << " (Invalid Server)" << endl;
+#endif
+				delete server;
+			}
+		}
+
+		for( list < ServerListItem* >::iterator iter = newServers.begin( ); iter != newServers.end( ); )
+		{
+			if( !(*iter)->WasQuerySent( ) )
+			{
 				if( sentQueriesThisPulse < MAX_QUERIES_PER_PULSE )
 				{
-					if( (*iter)->SendQuery( ) );
+					if( (*iter)->SendQuery( ) )
 					{
 						++ sentQueriesThisPulse;
+						newServers.erase( iter++ );
+					}
+					else
+					{
+						++ iter;
 					}
 				}
-				++ iter;
+				else
+				{
+					/* Let's fast-forward to the end of the list as we don't want to mess with more stuff */
+					break;
+				}
 			}
 		}
 		return newServersThisPulse;

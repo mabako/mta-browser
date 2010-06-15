@@ -86,18 +86,4 @@ namespace browse
 		}
 		return false;
 	}
-	
-	Server* ServerListItem::Receive( )
-	{
-		char buffer[ SERVER_LIST_QUERY_BUFFER ] = { 0 };
-		if( recvfrom( sock, buffer, sizeof( buffer ), 0, ( sockaddr* ) &address, &addressSize ) > 0 )
-		{
-			/* Since we have some data, we don't need to reference our socket anymore. */
-			sock = 0;
-		
-			/* Return the details */
-			return new Server( buffer, ip );
-		}
-		return NULL;
-	}
 }
