@@ -258,7 +258,7 @@ namespace browse
 				gchar* content[1];
 				content[0] = ( gchar* ) (*iter)->GetName( ).c_str( );
 				
-				gint row = gtk_clist_append( GTK_CLIST( pgPlayerList ), content );
+				gtk_clist_append( GTK_CLIST( pgPlayerList ), content );
 			}
 			
 			/* Unfreeze the list again to have it updated */
