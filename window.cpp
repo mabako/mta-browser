@@ -276,7 +276,7 @@ namespace browse
 			}
 			
 			/* Sort me */
-			gtk_clist_sort( GTK_CLIST( pgServerList ) );
+			gtk_clist_sort( GTK_CLIST( pgPlayerList ) );
 			
 			/* Unfreeze the list again to have it updated */
 			gtk_clist_thaw( GTK_CLIST( pgPlayerList ) );
