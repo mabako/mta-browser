@@ -42,10 +42,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #define MAX_QUERIES_PER_PULSE		5
 
 /* Check if _WIN32 is defined (Visual Studio) */
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(WIN32)
 	#define WIN32
 #endif
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(DEBUG)
 	#define DEBUG
 #endif
