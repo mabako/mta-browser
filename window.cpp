@@ -98,7 +98,7 @@ namespace browse
 		gtk_widget_show_all( pgWindow );
 		
 		/* we want to be updated! */
-		gtk_timeout_add( 50, &Pulse, this );
+		gtk_timeout_add( FETCH_NEW_SERVERS_INTERVAL, &Pulse, this );
 		
 		/* Closing handler */
 		g_signal_connect_swapped( G_OBJECT( pgWindow ), "destroy", G_CALLBACK( &Destroy ), this );

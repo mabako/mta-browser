@@ -39,7 +39,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #define ASE_VERSION                 "1.0"
 
 /* Max. Queries to send per pulse */
-#define MAX_QUERIES_PER_PULSE		5
+#define MAX_QUERIES_PER_PULSE		20
+
+/* How often ServerList::Pulse should be called */
+#define FETCH_NEW_SERVERS_INTERVAL	100
 
 /* Check if _WIN32 is defined (Visual Studio) */
 #if defined(_WIN32) && !defined(WIN32)
