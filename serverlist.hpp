@@ -34,6 +34,7 @@ namespace browse
 		void				Refresh( );
 		list < Server* >	Pulse( );
 		list < Server* >	Filter( string filter );
+		const string		GetStatus( );
 	private:
 		void				Clear( );
 		void				ParseList( string list );
@@ -42,5 +43,8 @@ namespace browse
 		list < Server* >			servers;
 		list < ServerListItem* >	newServers;
 		string						filter;
+		
+		unsigned short				totalServers;
+		unsigned short				filteredServers;
 	};
 }

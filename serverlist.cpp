@@ -139,6 +139,10 @@ namespace browse
 		flags |= O_NONBLOCK;
 		fcntl(sock, F_SETFL, flags);
 #endif
+		
+		/* Initalize our status */
+		totalServers = 0;
+		filteredServers = 0;
 	}
 	
 	ServerList::~ServerList( )
@@ -222,6 +226,7 @@ namespace browse
 				/* We only want it to appear on the GUI if it matches our filter */
 				if( server->Matches( filter ) )
 				{
+					++ filteredServers;
 					newServersThisPulse.push_back( server );
 				}
 			}
@@ -270,6 +275,7 @@ namespace browse
 			if( (*iter)->Matches( filter ) )
 				matchingServers.push_back( *iter );
 		
+		filteredServers = matchingServers.size( );
 		return matchingServers;
 	}
 	
@@ -288,6 +294,10 @@ namespace browse
 			delete *iter;
 		}
 		servers.clear( );
+		
+		/* Update our status */
+		totalServers = 0;
+		filteredServers = 0;
 	}
 	
 	/* Parses the Server List and creates a new class for each server */
@@ -297,6 +307,7 @@ namespace browse
 			return;
 		
 		unsigned short count = ( list[0] << 8 ) + list[1];
+		totalServers = count;
 		/*
 		cout << "Server List: " << count << " Servers" << endl;
 		*/
@@ -320,5 +331,17 @@ namespace browse
 			
 			pos += 6;
 		}
+	}
+
+	const string ServerList::GetStatus( )
+	{
+		stringstream ss;
+		if( filter.length( ) == 0 )
+			ss << "Found " << servers.size( ) << "/" << totalServers << " Servers";
+		else if( filteredServers == 0 )
+			return "No matching Servers found";
+		else
+			ss << "Found " << filteredServers << "/" << totalServers << " matching Servers";
+		return ss.str( );
 	}
 }

@@ -79,10 +79,15 @@ namespace browse
 		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pgFilter, 0, 1, 19, 20 );
 		gtk_signal_connect( GTK_OBJECT( pgFilter ), "changed", GTK_SIGNAL_FUNC( &ChangeFilter ), this );
 		
+		pgStatus = gtk_label_new( "Querying Game-Monitor.com" );
 #ifdef WIN32
+		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pgStatus, 1, 2, 19, 20 );
+		
 		pgButtonConnect = gtk_button_new_with_label( "Connect" );
 		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pgButtonConnect, 2, 3, 19, 20 );
 		gtk_signal_connect( GTK_OBJECT( pgButtonConnect ), "clicked", GTK_SIGNAL_FUNC( &Connect ), this );
+#else
+		gtk_table_attach_defaults( GTK_TABLE( pLayout ), pgStatus, 1, 3, 19, 20 );
 #endif
 		/* Refresh Button */
 		GtkWidget* pButtonRefresh = gtk_button_new_with_label( "Refresh" );
@@ -167,6 +172,9 @@ namespace browse
 			
 			/* Sort me */
 			gtk_clist_sort( GTK_CLIST( pgServerList ) );
+
+			/* Update our status */
+			pWindow->UpdateStatusLabel( pServerList->GetStatus( ) );
 		}
 		
 		/* We want to continue execution of our function. */
@@ -178,6 +186,9 @@ namespace browse
 	{
 		Window* pWindow = static_cast < Window* > ( data );
 		assert( pWindow );
+		
+		/* Set the new status */
+		pWindow->UpdateStatusLabel( "Querying Game-Monitor.com" );
 		
 		/* Clear the old list */
 		GtkWidget* pgServerList = pWindow->GetServerListWidget( );
@@ -325,6 +336,9 @@ namespace browse
 		
 		/* Save for later use */
 		pWindow->SetSelectedServer( NULL );
+
+		/* Update our status */
+		pWindow->UpdateStatusLabel( pServerList->GetStatus( ) );
 	}
 	
 	/* Let's compare us! We need a custom definition since we want this to be by player count. */
@@ -416,5 +430,12 @@ namespace browse
 	GtkWidget* Window::GetPlayerListWidget( )
 	{
 		return pgPlayerList;
+	}
+	
+	/* Updates the Status Label to display a certain text */
+	void Window::UpdateStatusLabel( string text )
+	{
+		assert( pgStatus );
+		gtk_label_set_text( GTK_LABEL( pgStatus ), ( gchar* ) text.c_str( ) );
 	}
 }

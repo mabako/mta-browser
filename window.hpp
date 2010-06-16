@@ -47,12 +47,14 @@ namespace browse
 		void        SetSelectedServer( Server* server );
 		GtkWidget*  GetServerListWidget( );
 		GtkWidget*  GetPlayerListWidget( );
+		void		UpdateStatusLabel( string text );
 	private:
 		void        AddToServerList( Server* server );
 		
 		GtkWidget*  pgWindow;
 		GtkWidget*  pgServerList;
 		GtkWidget*  pgPlayerList;
+		GtkWidget*	pgStatus;
 #ifdef WIN32
 		GtkWidget*  pgButtonConnect;
 #endif
