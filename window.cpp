@@ -167,11 +167,11 @@ namespace browse
 			for( list < Server* >::iterator iter = newServers.begin( ); iter != newServers.end( ); ++ iter )
 				pWindow->AddToServerList( *iter );
 			
-			/* Unfreeze the list again to have it updated */
-			gtk_clist_thaw( GTK_CLIST( pgServerList ) );
-			
 			/* Sort me */
 			gtk_clist_sort( GTK_CLIST( pgServerList ) );
+			
+			/* Unfreeze the list again to have it updated */
+			gtk_clist_thaw( GTK_CLIST( pgServerList ) );
 
 			/* Update our status */
 			pWindow->UpdateStatusLabel( pServerList->GetStatus( ) );
@@ -275,11 +275,11 @@ namespace browse
 				gtk_clist_append( GTK_CLIST( pgPlayerList ), content );
 			}
 			
+			/* Sort me */
+			gtk_clist_sort( GTK_CLIST( pgServerList ) );
+			
 			/* Unfreeze the list again to have it updated */
 			gtk_clist_thaw( GTK_CLIST( pgPlayerList ) );
-			
-			/* Sort me */
-			gtk_clist_sort( GTK_CLIST( pgPlayerList ) );
 		}
 		
 		/* Save for later use */
@@ -327,11 +327,11 @@ namespace browse
 			for( list < Server* >::iterator iter = newServers.begin( ); iter != newServers.end( ); ++ iter )
 				pWindow->AddToServerList( *iter );
 			
-			/* Unfreeze the list again to have it updated */
-			gtk_clist_thaw( GTK_CLIST( pgServerList ) );
-			
 			/* Sort me */
 			gtk_clist_sort( GTK_CLIST( pgServerList ) );
+			
+			/* Unfreeze the list again to have it updated */
+			gtk_clist_thaw( GTK_CLIST( pgServerList ) );
 		}
 		
 		/* Save for later use */
