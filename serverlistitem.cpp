@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <string.h>
 
+#include "config.hpp"
+
 /* Networking stuff */
 #ifndef WIN32
 	#include <arpa/inet.h>
@@ -28,7 +30,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	#include <iostream>
 #endif
 
-#include "config.hpp"
 #include "serverlistitem.hpp"
 
 namespace browse

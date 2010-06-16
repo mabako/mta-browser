@@ -24,7 +24,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 #ifdef WIN32
-int WinMain( HINSTANCE, HINSTANCE, LPSTR, int )
+int
+#ifdef _MSC_VER
+	/* Visual Studio wants us to use a stdcall, let's go for it */
+	__stdcall
+#endif
+WinMain( HINSTANCE, HINSTANCE, LPSTR, int )
 {
 	/* Call GTK's initalization */
 	gtk_init( NULL, NULL );

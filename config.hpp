@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 /* Version of this app */
-#define VERSION                     "1.4"
+#define VERSION                     "1.5"
 
 /* Name of the Window */
 #define APPLICATION_TITLE			"MTA Server Browser " VERSION
@@ -40,3 +40,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 /* Max. Queries to send per pulse */
 #define MAX_QUERIES_PER_PULSE		5
+
+/* Check if _WIN32 is defined (Visual Studio) */
+#ifdef _WIN32
+	#define WIN32
+#endif
+
+#ifdef _DEBUG
+	#define DEBUG
+#endif

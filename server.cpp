@@ -68,7 +68,7 @@ namespace browse
 		/* Port */
 		if( !ReadString( temp ) )
 			return;
-		port = atoi( temp.c_str( ) );
+		port = ( unsigned short ) atoi( temp.c_str( ) );
 		
 		/* Server Name */
 		if( !ReadString( name ) )
@@ -102,12 +102,12 @@ namespace browse
 		/* Number of players */
 		if( !ReadString( temp ) )
 			return;
-		numplayers = atoi( temp.c_str( ) );
+		numplayers = ( unsigned char ) atoi( temp.c_str( ) );
 		
 		/* Max. number of players */
 		if( !ReadString( temp ) )
 			return;
-		maxplayers = atoi( temp.c_str( ) );
+		maxplayers = ( unsigned char ) atoi( temp.c_str( ) );
 		
 		/* Rules - I mean, who cares? */
 		do
@@ -127,7 +127,7 @@ namespace browse
 		while( true ); /* Break me, c'mon */
 		
 		/* Read the player list */
-		for( unsigned char ppos; ppos < numplayers; ppos ++ )
+		for( unsigned char ppos = 0; ppos < numplayers; ppos ++ )
 		{
 			Player* player = ReadPlayer( );
 			if( player )
