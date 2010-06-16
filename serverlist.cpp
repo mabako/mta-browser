@@ -161,6 +161,27 @@ namespace browse
 	{
 		Clear( );
 		
+		/* Delete the old socket since we do not want its messages anymore */
+		if( sock > 0 )
+#ifdef WIN32
+			closesocket( sock );
+#else
+			close( sock );
+#endif
+		
+		/* Create another socket */
+		sock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+		
+		/* We need non-blocking sockets */
+#ifdef _WIN32
+		unsigned long flag = 1;
+		ioctlsocket( sock, FIONBIO, &flag );
+#else
+		int flags = fcntl(sock, F_GETFL);
+		flags |= O_NONBLOCK;
+		fcntl(sock, F_SETFL, flags);
+#endif
+		
 		/* New HTTP request */
 		HTTP* pHTTP = new HTTP( SERVER_LIST_URL, SERVER_LIST_MASTER_TIMEOUT );
 		if( pHTTP )
