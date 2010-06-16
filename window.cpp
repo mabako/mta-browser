@@ -218,9 +218,12 @@ namespace browse
 	/* Called whenever we click 'Close' or the X. Obviously we want to exit */
 	void Window::Destroy( GtkWidget* pWidget, gpointer data )
 	{
+#if 0
+		/* This application has exceptions when exitting, probably caused by this code */
 		Window* pWindow = static_cast < Window* > ( data );
 		assert( pWindow );
 		delete pWindow;
+#endif
 		
 		/* Let GTK handle itself. */
 		gtk_main_quit( );
