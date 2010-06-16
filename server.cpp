@@ -151,7 +151,7 @@ namespace browse
 				stringstream temp;
 				for( unsigned int i = pos + 1; i < ( pos + len ); i ++ )
 				{
-					char c = buffer[i];
+					unsigned char c = buffer[i];
 					if( c >= 32 && c <= 127 )
 						temp << c;
 				}
