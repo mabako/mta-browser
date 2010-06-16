@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 /* Version of this app */
-#define VERSION                     "1.5"
+#define VERSION                     "1.6"
 
 /* Name of the Window */
 #define APPLICATION_TITLE			"MTA Server Browser " VERSION
