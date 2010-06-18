@@ -31,13 +31,13 @@ namespace browse
 		 ServerList( );
 		~ServerList( );
 		
-		void				Refresh( );
+		const string		Refresh( );
 		list < Server* >	Pulse( );
 		list < Server* >	Filter( string filter );
 		const string		GetStatus( );
 	private:
 		void				Clear( );
-		void				ParseList( string list );
+		const string		ParseList( string list );
 		
 		int							sock;
 		list < Server* >			servers;

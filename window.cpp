@@ -111,7 +111,11 @@ namespace browse
 		/* Create our server list class and let it fetch all servers. */
 		pServerList = new ServerList( );
 		if( pServerList )
-			pServerList->Refresh( );
+		{
+			const string error = pServerList->Refresh( );
+			if( error.length( ) > 0 )
+				UpdateStatusLabel( error );
+		}
 		
 		SetSelectedServer( NULL );
 	}
@@ -203,7 +207,9 @@ namespace browse
 		/* Refresh the List */
 		ServerList* pServerList = pWindow->GetServerList( );
 		assert( pServerList );
-		pServerList->Refresh( );
+		const string error = pServerList->Refresh( );
+		if( error.length( ) > 0 )
+			pWindow->UpdateStatusLabel( error );
 		
 		/* We don't have no server no more */
 		pWindow->SetSelectedServer( NULL );

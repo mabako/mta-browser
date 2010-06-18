@@ -66,7 +66,32 @@ namespace browse
 				
 				if( curlresult == CURLE_OK )
 				{
-					result = buffer;
+					/* Check for HTTP Status code */
+					long httpcode = 0;
+					curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &httpcode );
+					switch( httpcode )
+					{
+						case 0: /* Will be returned if no response code is recieved */
+						case 200:
+							result = buffer;
+							break;
+						case 401:
+							error = "GM Error 401: Unauthorized";
+							break;
+						case 403:
+							error = "GM Error 403: Forbidden";
+							break;
+						case 404:
+							error = "GM Error 404: Not Found";
+							break;
+						case 500:
+							error = "GM Error 500: Internal Server Error";
+							break;
+						default:
+							stringstream ss;
+							ss << "GM Error " << httpcode;
+							error = ss.str( );
+					}
 					return;
 				}
 				
@@ -161,7 +186,7 @@ namespace browse
 	}
 	
 	/* Clears the old server list and instead fetches it again */
-	void ServerList::Refresh( )
+	const string ServerList::Refresh( )
 	{
 		Clear( );
 		
@@ -192,16 +217,15 @@ namespace browse
 		{
 			if( pHTTP->WasSuccessful( ) )
 			{
-				ParseList( pHTTP->GetResult( ) );
+				return ParseList( pHTTP->GetResult( ) );
 			}
-#ifdef DEBUG
 			else
 			{
-				cout << "Error fetching Server List: " << pHTTP->GetError( ) << endl;
+				return pHTTP->GetError( );
 			}
-#endif
 			delete pHTTP;
 		}
+		return "";
 	}
 	
 	/* Performs a single tick */
@@ -301,13 +325,14 @@ namespace browse
 	}
 	
 	/* Parses the Server List and creates a new class for each server */
-	void ServerList::ParseList( string list )
+	const string ServerList::ParseList( string list )
 	{
 		if( list.length( ) < 2 )
-			return;
+			return "Failed to parse List";
 		
 		unsigned short count = ( list[0] << 8 ) + list[1];
 		totalServers = count;
+		
 		/*
 		cout << "Server List: " << count << " Servers" << endl;
 		*/
@@ -331,6 +356,7 @@ namespace browse
 			
 			pos += 6;
 		}
+		return "";
 	}
 
 	const string ServerList::GetStatus( )
