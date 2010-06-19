@@ -3,3 +3,5 @@ browse
 *.dll
 *.exe
 *.layout
+*.zip
+*.tar.gz
