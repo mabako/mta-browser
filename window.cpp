@@ -48,7 +48,7 @@ namespace browse
 		/* Server List */
 		gchar* serverListTitles[5] = { ( gchar* ) "Name", ( gchar* ) "Players", ( gchar* ) "Gametype", ( gchar* ) "Map", ( gchar* ) "IP/Port" };
 		pgServerList = gtk_clist_new_with_titles( 5, serverListTitles );
-		gtk_clist_set_sort_column( GTK_CLIST( pgServerList ), 1 ); /* FIXME: You should be able to select other columns to sort by */
+		gtk_clist_set_sort_column( GTK_CLIST( pgServerList ), 1 );
 		gtk_clist_set_compare_func( GTK_CLIST( pgServerList ), &ComparePlayers );
 		gtk_clist_set_column_width( GTK_CLIST( pgServerList ), 0, 250 );
 		gtk_clist_set_column_width( GTK_CLIST( pgServerList ), 1, 60 );
@@ -57,6 +57,7 @@ namespace browse
 		gtk_clist_set_column_width( GTK_CLIST( pgServerList ), 4, 150 );
 		gtk_signal_connect( GTK_OBJECT( pgServerList ), "select-row", GTK_SIGNAL_FUNC( &SelectServer ), this );
 		gtk_signal_connect( GTK_OBJECT( pgServerList ), "unselect-row", GTK_SIGNAL_FUNC( &SelectNoServer ), this );
+		gtk_signal_connect( GTK_OBJECT( pgServerList ), "click-column", GTK_SIGNAL_FUNC( &SetSortColumn ), this );
 		GtkObject* hadj = gtk_adjustment_new( 0.0, 0.0, 1.0, 0.01, 0.1, 0.1 );
 		GtkObject* vadj = gtk_adjustment_new( 0.0, 0.0, 1.0, 0.01, 0.1, 0.1 );
 		GtkWidget* pgServerScroll = gtk_scrolled_window_new( GTK_ADJUSTMENT( hadj ), GTK_ADJUSTMENT( vadj ) );
@@ -360,6 +361,32 @@ namespace browse
 
 		/* Update our status */
 		pWindow->UpdateStatusLabel( pServerList->GetStatus( ) );
+	}
+	
+	void Window::SetSortColumn( GtkCList* list, gint column, gpointer data )
+	{
+		Window* pWindow = static_cast < Window* > ( data );
+		assert( pWindow );
+		
+		GtkWidget* pgServerList = pWindow->GetServerListWidget( );
+		assert( pgServerList );
+		
+		if( column == list->sort_column )
+		{
+			/* Selected same column again, change ascending/descending */
+			gtk_clist_set_sort_type( GTK_CLIST( pgServerList ), ( GtkSortType ) ( 1 - list->sort_type ) );
+		}
+		else
+		{
+			/* We selected another column */
+			gtk_clist_set_sort_column( GTK_CLIST( pgServerList ), column );
+			if( column == 1 )
+				gtk_clist_set_compare_func( GTK_CLIST( pgServerList ), &ComparePlayers );
+			else
+				gtk_clist_set_compare_func( GTK_CLIST( pgServerList ), NULL );
+		}
+		
+		gtk_clist_sort( GTK_CLIST( pgServerList ) );
 	}
 	
 	/* Let's compare us! We need a custom definition since we want this to be by player count. */

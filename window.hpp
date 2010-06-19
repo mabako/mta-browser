@@ -40,6 +40,7 @@ namespace browse
 		static void SelectServer( GtkWidget* pWdidget, gint row, gint column, GdkEventButton* event, gpointer data );
 		static void SelectNoServer( GtkWidget* pWidget, gint row, gint column, GdkEventButton* event, gpointer data );
 		static void ChangeFilter( GtkEntry* pEntry, gpointer data );
+		static void SetSortColumn( GtkCList* list, gint column, gpointer data );
 		static gint ComparePlayers( GtkCList* list, gconstpointer ptr1, gconstpointer ptr2 );
 		
 		ServerList* GetServerList( );
