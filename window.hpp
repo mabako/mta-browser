@@ -50,6 +50,8 @@ namespace browse
 		void		UpdateStatusLabel( string text );
 	private:
 		void        AddToServerList( Server* server );
+		const bool	GetRefreshOnNextPulse( );
+		void		SetRefreshOnNextPulse( bool b );
 		
 		GtkWidget*  pgWindow;
 		GtkWidget*  pgServerList;
@@ -61,5 +63,7 @@ namespace browse
 		
 		ServerList* pServerList;
 		Server*     pSelectedServer;
+		
+		bool		refreshOnNextPulse;
 	};
 }

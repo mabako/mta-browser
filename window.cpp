@@ -110,12 +110,7 @@ namespace browse
 		
 		/* Create our server list class and let it fetch all servers. */
 		pServerList = new ServerList( );
-		if( pServerList )
-		{
-			const string error = pServerList->Refresh( );
-			if( error.length( ) > 0 )
-				UpdateStatusLabel( error );
-		}
+		SetRefreshOnNextPulse( true );
 		
 		SetSelectedServer( NULL );
 	}
@@ -127,6 +122,7 @@ namespace browse
 			delete pServerList;
 	}
 	
+	/* Adds a single server to the list */
 	void Window::AddToServerList( Server* server )
 	{
 		gchar* content[5];
@@ -145,7 +141,18 @@ namespace browse
 		
 		gint row = gtk_clist_append( GTK_CLIST( pgServerList ), content );
 		gtk_clist_set_row_data( GTK_CLIST( pgServerList ), row, server );
-
+	}
+	
+	/* Returns true if the list should be refreshed on the next pulse */
+	const bool Window::GetRefreshOnNextPulse( )
+	{
+		return refreshOnNextPulse;
+	}
+	
+	/* Sets whetever the list should be refreshed on next pulse (i.e. creating the window, clicking 'Refresh') */
+	void Window::SetRefreshOnNextPulse( bool b )
+	{
+		refreshOnNextPulse = b;
 	}
 	
 	/* Called to let us handle our internal stuff. */
@@ -159,6 +166,18 @@ namespace browse
 		
 		ServerList* pServerList = pWindow->GetServerList( );
 		assert( pServerList );
+		
+		/* If we were asked to refresh the list, do so */
+		if( pWindow->GetRefreshOnNextPulse( ) )
+		{
+			pWindow->SetRefreshOnNextPulse( false );
+			const string error = pServerList->Refresh( );
+			if( error.length( ) > 0 )
+			{
+				pWindow->UpdateStatusLabel( error );
+				return true;
+			}
+		}
 		
 		/* Check if new servers are available */
 		list < Server* > newServers = pServerList->Pulse( );
@@ -205,11 +224,7 @@ namespace browse
 		gtk_clist_clear( GTK_CLIST( pgPlayerList ) );
 		
 		/* Refresh the List */
-		ServerList* pServerList = pWindow->GetServerList( );
-		assert( pServerList );
-		const string error = pServerList->Refresh( );
-		if( error.length( ) > 0 )
-			pWindow->UpdateStatusLabel( error );
+		pWindow->SetRefreshOnNextPulse( true );
 		
 		/* We don't have no server no more */
 		pWindow->SetSelectedServer( NULL );
