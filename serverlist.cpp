@@ -213,19 +213,20 @@ namespace browse
 		
 		/* New HTTP request */
 		HTTP* pHTTP = new HTTP( SERVER_LIST_URL, SERVER_LIST_MASTER_TIMEOUT );
+		string returnValue = "";
 		if( pHTTP )
 		{
 			if( pHTTP->WasSuccessful( ) )
 			{
-				return ParseList( pHTTP->GetResult( ) );
+				returnValue = ParseList( pHTTP->GetResult( ) );
 			}
 			else
 			{
-				return pHTTP->GetError( );
+				returnValue = pHTTP->GetError( );
 			}
 			delete pHTTP;
 		}
-		return "";
+		return returnValue;
 	}
 	
 	/* Performs a single tick */
